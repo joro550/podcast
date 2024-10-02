@@ -1,4 +1,17 @@
 services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=bob
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=podcast
+    # healthcheck:
+    #   test: ["CMD-SHELL", pg_isready]
+    #   interval: 1s
+    #   timeout: 5s
+    #   retires: 10
+
   backend:
     build:
       context: backend
@@ -8,6 +21,11 @@ services:
       - 3111:3111
     volumes:
       - "./backend:/app"
+    environment:
+      - "Connection_string=host=host.docker.internal user=bob password=password dbname=podcast sslmode=disable"
+    depends_on:
+      - db
+        # condition: service_healthy
 
   frontend:
     build:
