@@ -1,0 +1,19 @@
+services:
+  backend:
+    build:
+      context: backend
+      dockerfile: dev.dockerfile
+    restart: always
+    ports:
+      - 3111:3111
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: frontend
+    restart: always
+    environment:
+      - NODE_ENV=development
+    ports:
+      - 3000:3000
