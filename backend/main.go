@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -8,10 +9,12 @@ import (
 )
 
 func main() {
+	fmt.Println("Starting server")
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hellow world"))
+		w.Write([]byte("hello world"))
 	})
 	http.ListenAndServe(":8080", r)
 }

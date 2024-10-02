@@ -11,13 +11,15 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /myapp .
+RUN go build -v -o server
 
-FROM alpine:3.20 AS run
+FROM debian:bookworm-slim
+RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy the application executable from the build image
-COPY --from=build /myapp /myapp
+# Copy the binary to the production image from the builder stage.
+COPY --from=build /app/server /app/server
 
-WORKDIR /app
-EXPOSE 8080
-CMD ["/myapp"]
+# Run the web service on container startup.
+CMD ["./app/server"]
