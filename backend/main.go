@@ -11,7 +11,7 @@ import (
 
 type Weather struct {
 	Location    string `json:"location"`
-	Temperature int    `json:"temperature1"`
+	Temperature int    `json:"temperature"`
 }
 
 func main() {
@@ -33,8 +33,12 @@ func main() {
 	r.Get("/weather", func(w http.ResponseWriter, r *http.Request) {
 		weather := Weather{Location: "London"}
 
+		weathers := []Weather{
+			weather,
+		}
+
 		encoder := json.NewEncoder(w)
-		err := encoder.Encode(weather)
+		err := encoder.Encode(weathers)
 		if err != nil {
 			http.Error(w, "Internal error", http.StatusInternalServerError)
 			return
