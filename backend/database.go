@@ -90,7 +90,7 @@ func walkDir(db *sql.DB, migrationsRan []string) func(path string, d fs.DirEntry
 
 		log.Println("Ran migration", path)
 
-		err = insertMigration(db, path)
+		err = insertMigration(db, d.Name())
 		if err == nil {
 			return err
 		}
