@@ -1,13 +1,10 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
-	"io/fs"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
+	"podcast-server/database"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -21,24 +18,10 @@ type Weather struct {
 }
 
 func main() {
-	val, found := os.LookupEnv("Connection_string")
-	if !found {
-		log.Fatal("Could not find connecton string")
-	}
-
-	log.Println("Connecting string!!!", val)
-
-	db, err := sql.Open("postgres", val)
+	_, err := database.ConnectToDatabase()
 	if err != nil {
-		log.Fatal("Could not connect to the database")
+		log.Fatalln(err)
 	}
-
-	err = runMigrations(db)
-	if err != nil {
-		log.Fatal("Migrations could not be run", err)
-	}
-
-	log.Println("Starting server")
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -62,30 +45,4 @@ func main() {
 	})
 
 	http.ListenAndServe(":3111", r)
-}
-
-func runMigrations(db *sql.DB) error {
-	err := filepath.WalkDir("migrations", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if d.IsDir() {
-			return nil
-		}
-
-		content, err := os.ReadFile(path)
-		if err != nil {
-			return err
-		}
-
-		_, err = db.Exec(string(content))
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	return err
 }

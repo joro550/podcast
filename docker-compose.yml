@@ -6,21 +6,23 @@ services:
       - POSTGRES_USER=bob
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=podcast
-    # healthcheck:
-    #   test: ["CMD-SHELL", pg_isready]
-    #   interval: 1s
-    #   timeout: 5s
-    #   retires: 10
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: email@domain.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    depends_on:
+      - db
 
   backend:
     build:
       context: backend
       dockerfile: dev.dockerfile
-    # develop:
-    #   watch:
-    #     - action: rebuild
-    #       path: ./backend
-    # restart: always
     ports:
       - 3111:3111
     volumes:
@@ -29,26 +31,30 @@ services:
       - "Connection_string=postgres://bob:password@db:5432/podcast?sslmode=disable"
     depends_on:
       - db
-        # condition: service_healthy
 
   frontend:
     container_name: podcast_frontend
     build:
       context: frontend
+      target: builder
+    restart: always
     command: npm run dev
-    develop:
-      watch:
-        - action: sync
-          path: /app/web
-          target: /app/web
-          ignore:
-            - node_modules/
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: /app/web
+    #       target: /app/web
+    #       ignore:
+    #         - node_modules/
     environment:
       - NODE_ENV=development
+      - WATCHPACK_POLLING=true
       - BACKEND_URL=http://backend:3111
     ports:
       - 3000:3000
     volumes:
-      - "./frontend:/app"
+      - "./frontend/:/app"
+      - "/app/node_modules"
+      - "/app/.next"
     depends_on:
       - backend
