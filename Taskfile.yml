@@ -12,3 +12,9 @@ tasks:
   down:
     cmds:
       - docker compose down
+
+  rebuild:
+    cmds:
+      - docker compose down
+      - docker compose build
+      - docker compose up -d

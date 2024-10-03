@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"podcast-server/database"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,7 +15,7 @@ type Weather struct {
 }
 
 func main() {
-	_, err := database.ConnectToDatabase()
+	_, err := ConnectToDatabase()
 	if err != nil {
 		log.Fatalln(err)
 	}

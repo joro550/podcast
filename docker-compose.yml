@@ -6,6 +6,12 @@ services:
       - POSTGRES_USER=bob
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=podcast
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "podcast"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
 
   pgadmin:
     image: dpage/pgadmin4
@@ -25,15 +31,16 @@ services:
       context: backend
     #   target: build
     # command: air
-      # dockerfile: dev.dockerfile
+    # dockerfile: dev.dockerfile
     ports:
       - 3111:3111
     # volumes:
     #   - "./backend/:/app"
     environment:
-      - "Connection_string=postgres://bob:password@db:5432/podcast?sslmode=disable"
+      - "Connection_string=postgresql://bob:password@db/podcast?sslmode=disable"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     container_name: podcast_frontend

@@ -1,4 +1,4 @@
-package database
+package main
 
 import (
 	"database/sql"
@@ -36,16 +36,33 @@ func runMigrations(db *sql.DB) error {
     filename VARCHAR(255) NOT NULL
 )`)
 	if err != nil {
+		log.Println("Failed to create migrations table")
 		return err
 	}
+	log.Println("created migrations table")
 
 	fileNames, err := getMigrations(db)
 	if err != nil {
 		return err
 	}
 
-	err = filepath.WalkDir("migrations", func(path string, d fs.DirEntry, err error) error {
+	log.Println("Retrieved migrations from table")
+
+	executablePath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	migrationPath := filepath.Join(filepath.Dir(executablePath), "migrations")
+	err = filepath.WalkDir(migrationPath, walkDir(db, fileNames))
+
+	return err
+}
+
+func walkDir(db *sql.DB, migrationsRan []string) func(path string, d fs.DirEntry, err error) error {
+	return func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
+			log.Println("Err from walk dir", err)
 			return err
 		}
 
@@ -53,29 +70,35 @@ func runMigrations(db *sql.DB) error {
 			return nil
 		}
 
-		if slices.Contains(fileNames, path) {
+		if slices.Contains(migrationsRan, path) {
 			return nil
 		}
 
 		content, err := os.ReadFile(path)
 		if err != nil {
+
+			log.Println("Error reading file", err)
 			return err
 		}
 
 		_, err = db.Exec(string(content))
 		if err != nil {
+
+			log.Println("error executing", err)
 			return err
 		}
+
+		log.Println("Ran migration", path)
 
 		err = insertMigration(db, path)
 		if err == nil {
 			return err
 		}
 
-		return nil
-	})
+		log.Println("Inserted migration into migration table", path)
 
-	return err
+		return nil
+	}
 }
 
 func getMigrations(db *sql.DB) ([]string, error) {
