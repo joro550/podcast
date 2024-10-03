@@ -20,13 +20,16 @@ services:
       - db
 
   backend:
+    image: podcast_backend
     build:
       context: backend
-      dockerfile: dev.dockerfile
+    #   target: build
+    # command: air
+      # dockerfile: dev.dockerfile
     ports:
       - 3111:3111
-    volumes:
-      - "./backend/:/app"
+    # volumes:
+    #   - "./backend/:/app"
     environment:
       - "Connection_string=postgres://bob:password@db:5432/podcast?sslmode=disable"
     depends_on:

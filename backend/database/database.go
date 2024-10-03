@@ -19,7 +19,7 @@ func ConnectToDatabase() (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", val)
 	if err != nil {
-		log.Fatal("Could not connect to the database")
+		log.Fatal("Could not connect to the database", err)
 	}
 
 	err = runMigrations(db)
