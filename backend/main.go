@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"io/fs"
 	"log"
 	"net/http"
@@ -14,9 +15,14 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type Weather struct {
+	Location    string `json:"location"`
+	Temperature int    `json:"temperature"`
+}
+
 func main() {
-	val, valid := os.LookupEnv("Connection_string")
-	if !valid {
+	val, found := os.LookupEnv("Connection_string")
+	if !found {
 		log.Fatal("Could not find connecton string")
 	}
 
@@ -44,11 +50,26 @@ func main() {
 		w.WriteHeader(200)
 	})
 
+	r.Get("/weather", func(w http.ResponseWriter, r *http.Request) {
+		weather := Weather{Location: "London"}
+
+		encoder := json.NewEncoder(w)
+		err := encoder.Encode(weather)
+		if err != nil {
+			http.Error(w, "Internal error", http.StatusInternalServerError)
+			return
+		}
+	})
+
 	http.ListenAndServe(":3111", r)
 }
 
 func runMigrations(db *sql.DB) error {
 	err := filepath.WalkDir("migrations", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
 		if d.IsDir() {
 			return nil
 		}

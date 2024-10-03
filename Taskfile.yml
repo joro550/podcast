@@ -3,4 +3,4 @@ version: "3"
 tasks:
   up:
     cmds:
-      - docker compose up --watch
+      - docker compose watch

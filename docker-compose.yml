@@ -13,21 +13,27 @@ services:
     #   retires: 10
 
   backend:
+    container_name: podcast_backend
     build:
       context: backend
-      dockerfile: dev.dockerfile
+      # dockerfile: dev.dockerfile
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend
     restart: always
     ports:
       - 3111:3111
-    volumes:
-      - "./backend:/app"
+    # volumes:
+    #   - "./backend:/app"
     environment:
-      - "Connection_string=host=host.docker.internal user=bob password=password dbname=podcast sslmode=disable"
+      - "Connection_string=postgres://bob:password@db:5432/podcast?sslmode=disable"
     depends_on:
       - db
         # condition: service_healthy
 
   frontend:
+    container_name: podcast_frontend
     build:
       context: frontend
     command: npm run dev
@@ -40,6 +46,7 @@ services:
             - node_modules/
     environment:
       - NODE_ENV=development
+      - BACKEND_URL=http://backend:3111
     ports:
       - 3000:3000
 
