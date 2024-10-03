@@ -13,19 +13,18 @@ services:
     #   retires: 10
 
   backend:
-    container_name: podcast_backend
     build:
       context: backend
-      # dockerfile: dev.dockerfile
-    develop:
-      watch:
-        - action: rebuild
-          path: ./backend
-    restart: always
+      dockerfile: dev.dockerfile
+    # develop:
+    #   watch:
+    #     - action: rebuild
+    #       path: ./backend
+    # restart: always
     ports:
       - 3111:3111
-    # volumes:
-    #   - "./backend:/app"
+    volumes:
+      - "./backend/:/app"
     environment:
       - "Connection_string=postgres://bob:password@db:5432/podcast?sslmode=disable"
     depends_on:
@@ -49,7 +48,6 @@ services:
       - BACKEND_URL=http://backend:3111
     ports:
       - 3000:3000
-
     volumes:
       - "./frontend:/app"
     depends_on:

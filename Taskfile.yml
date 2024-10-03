@@ -4,3 +4,11 @@ tasks:
   up:
     cmds:
       - docker compose watch
+
+  build:
+    cmds:
+      - docker compose build
+
+  down:
+    cmds:
+      - docker compose down

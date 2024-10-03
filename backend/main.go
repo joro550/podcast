@@ -17,7 +17,7 @@ import (
 
 type Weather struct {
 	Location    string `json:"location"`
-	Temperature int    `json:"temperature"`
+	Temperature int    `json:"temperature1"`
 }
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 		log.Fatal("Could not find connecton string")
 	}
 
-	log.Println("connecting string", val)
+	log.Println("Connecting string!!!", val)
 
 	db, err := sql.Open("postgres", val)
 	if err != nil {
