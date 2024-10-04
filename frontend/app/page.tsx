@@ -1,20 +1,25 @@
+'use client'
+
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import PodcastService from "../src/podcast-service";
+import { useEffect, useState } from "react";
 import { Weather } from "../src/podcast-models";
 
-export async function getStaticProps() {
-  let service = new PodcastService();
-  let weathers = await service.getWeather();
+export default function Home() {
+  const [posts, setPosts] = useState<Weather[]>([])
 
-  return {
-    props: {
-      weather: weathers,
-    },
-  };
-}
+  useEffect(() => {
+    async function fetchPosts() {
 
-export default function Home({ weather }: { weather: Weather[] }) {
+      let service = new PodcastService();
+      let weather = await service.getWeather();
+      setPosts(weather)
+    }
+    fetchPosts()
+  }, [])
+
+
   return (
     <div className={styles.container}>
       <Head>
@@ -36,7 +41,7 @@ export default function Home({ weather }: { weather: Weather[] }) {
           <th>
             <td>Tempreture</td>
           </th>
-          {weather.map((w) => (
+          {posts.map((w) => (
             <tr>
               <td>{w.temperature}</td>
             </tr>

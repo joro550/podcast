@@ -48,17 +48,10 @@ services:
       target: builder
     restart: always
     command: npm run dev
-    # develop:
-    #   watch:
-    #     - action: sync
-    #       path: /app/web
-    #       target: /app/web
-    #       ignore:
-    #         - node_modules/
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
-      - BACKEND_URL=http://backend:3111
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:3111
     ports:
       - 3000:3000
     volumes:
