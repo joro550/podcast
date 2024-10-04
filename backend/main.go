@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"podcast-server/presenters"
+	"podcast-server/shared"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,10 +18,12 @@ type Weather struct {
 }
 
 func main() {
-	_, err := ConnectToDatabase()
+	db, err := ConnectToDatabase()
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	appServices := shared.NewAppService(db)
 
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
@@ -34,6 +38,8 @@ func main() {
 	}))
 
 	r.Use(middleware.Logger)
+	presenters.AddPresenterEndpoints(r, &appServices)
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hello mark"))
 	})

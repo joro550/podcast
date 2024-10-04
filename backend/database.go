@@ -70,7 +70,7 @@ func walkDir(db *sql.DB, migrationsRan []string) func(path string, d fs.DirEntry
 			return nil
 		}
 
-		if slices.Contains(migrationsRan, path) {
+		if slices.Contains(migrationsRan, d.Name()) {
 			return nil
 		}
 
