@@ -38,9 +38,9 @@ export default function Home() {
         </p>
 
         <table>
-          <th>
-            <td>Tempreture</td>
-          </th>
+          <tr>
+            <th>Tempreture</th>
+          </tr>
           {posts.map((w) => (
             <tr>
               <td>{w.temperature}</td>
