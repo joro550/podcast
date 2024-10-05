@@ -4,8 +4,8 @@ export default class PodcastService {
   private _baseUrl: string;
 
   constructor() {
-    this._baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL
-      ?? '';
+    this._baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
+    console.log("Getting backend url", process.env.NEXT_PUBLIC_BACKEND_URL);
   }
 
   public async getWeather(): Promise<Weather[]> {
