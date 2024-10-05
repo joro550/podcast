@@ -14,6 +14,7 @@ import (
 
 type Weather struct {
 	Location    string `json:"location"`
+	Id          int    `json:"id"`
 	Temperature int    `json:"temperature"`
 }
 
@@ -49,7 +50,7 @@ func main() {
 	})
 
 	r.Get("/weather", func(w http.ResponseWriter, r *http.Request) {
-		weather := Weather{Location: "London"}
+		weather := Weather{Id: 1, Location: "London"}
 
 		weathers := []Weather{
 			weather,

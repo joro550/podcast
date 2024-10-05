@@ -1,7 +1,7 @@
 "use client";
 
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
+import styles from "../../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import { Weather } from "../podcast-models";
 import PodcastService from "../podcast-service";
@@ -36,14 +36,18 @@ export default function Home() {
         </p>
 
         <table>
-          <tr>
-            <th>Tempreture</th>
-          </tr>
-          {posts.map((w) => (
+          <thead>
             <tr>
-              <td>{w.temperature}</td>
+              <th>Tempreture</th>
             </tr>
-          ))}
+          </thead>
+          <tbody>
+            {posts.map((w) => (
+              <tr key={w.id}>
+                <td>{w.temperature}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
 
         <div className={styles.grid}>
