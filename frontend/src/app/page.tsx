@@ -1,24 +1,22 @@
-'use client'
+"use client";
 
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import PodcastService from "../src/podcast-service";
 import { useEffect, useState } from "react";
-import { Weather } from "../src/podcast-models";
+import { Weather } from "../podcast-models";
+import PodcastService from "../podcast-service";
 
 export default function Home() {
-  const [posts, setPosts] = useState<Weather[]>([])
+  const [posts, setPosts] = useState<Weather[]>([]);
 
   useEffect(() => {
     async function fetchPosts() {
-
       let service = new PodcastService();
       let weather = await service.getWeather();
-      setPosts(weather)
+      setPosts(weather);
     }
-    fetchPosts()
-  }, [])
-
+    fetchPosts();
+  }, []);
 
   return (
     <div className={styles.container}>

@@ -1,3 +1,4 @@
+"use client";
 import { Weather } from "./podcast-models";
 
 export default class PodcastService {
