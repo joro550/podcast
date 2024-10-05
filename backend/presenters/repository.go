@@ -36,3 +36,15 @@ func (repo *PresenterRepository) Get() ([]Presenter, error) {
 
 	return presenters, nil
 }
+
+func (repo *PresenterRepository) GetPresenter(name string) (Presenter, error) {
+	rows := repo.db.QueryRow("select id, name from presenters where name = ?", name)
+
+	var presenter Presenter
+	err := rows.Scan(&presenter.Id, &presenter.Name)
+	if err != nil {
+		return Presenter{}, err
+	}
+
+	return presenter, nil
+}

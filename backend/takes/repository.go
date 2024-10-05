@@ -3,6 +3,7 @@ package takes
 import (
 	"database/sql"
 	"encoding/json"
+	"time"
 )
 
 type TakesRepository struct {
@@ -10,10 +11,13 @@ type TakesRepository struct {
 }
 
 type Take struct {
+	CreatedDate   time.Time
+	DueDate       time.Time
 	Content       string
-	Tags          []string
-	Id            int
 	PresenterName string
+	Tags          []string
+	PresenterId   int
+	Id            int
 	EpisodeId     int
 	Result        int
 }
@@ -51,4 +55,24 @@ func (db *TakesRepository) GetTakes() ([]Take, error) {
 	}
 
 	return takes, nil
+}
+
+func (db *TakesRepository) InsertTake(mode Take) error {
+	result, err := json.Marshal(mode.Tags)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.db.Exec(`insert into hot_take (content, presenter, tags, episode_id, result, created_date, due_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		mode.Content,
+		mode.PresenterId,
+		string(result),
+		mode.EpisodeId,
+		mode.Result,
+		mode.CreatedDate,
+		mode.DueDate,
+	)
+
+	return err
 }
