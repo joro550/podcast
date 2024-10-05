@@ -21,6 +21,7 @@ func (repo *EpisodesRespository) Get() ([]Episode, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	episodes := []Episode{}
 

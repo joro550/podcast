@@ -20,6 +20,7 @@ func (repo *PresenterRepository) Get() ([]Presenter, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	presenters := []Presenter{}
 

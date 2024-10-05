@@ -33,6 +33,7 @@ func (db *TakesRepository) GetTakes() ([]Take, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	takes := []Take{}
 
