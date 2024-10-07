@@ -1,15 +1,18 @@
 package main
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	_ "embed"
 	"encoding/csv"
+	"encoding/json"
 	"podcast-server/episodes"
 	"podcast-server/presenters"
 	"podcast-server/takes"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // go:embed seed/takes.csv
@@ -23,11 +26,84 @@ func seedDatabase(db *sql.DB) error {
 	takesRespository := takes.NewRepo(db)
 	episodeRepo := episodes.NewRepo(db)
 
-	presenter, err := initPresenter(presenterRepository)
+	err := createEpisodes(episodeRepo)
 	if err != nil {
 		return err
 	}
 
+	dbPresenters, err := initPresenter(presenterRepository)
+	if err != nil {
+		return err
+	}
+
+	dbTakes, err := takesRespository.GetTakeSha()
+	if err != nil {
+		return nil
+	}
+
+	stringReader := strings.NewReader(takesFile)
+	reader := csv.NewReader(stringReader)
+
+	reader.Read()
+	rows, err := reader.ReadAll()
+	for _, row := range rows {
+		presenter := row[1]
+		content := row[2]
+		tags := row[3]
+		createdDateString := row[4]
+		dueDateString := row[5]
+		wasCorrect := row[6]
+
+		createDate, err := time.Parse("2023-01-01", createdDateString)
+		if err != nil {
+			return nil
+		}
+
+		dueDate, err := time.Parse("2023-01-01", dueDateString)
+		if err != nil {
+			return nil
+		}
+
+		tagsSplit := strings.Split(",", tags)
+
+		var presenterId int
+		switch strings.ToLower(presenter) {
+		case "thorin":
+			presenterId = dbPresenters.ThorinId
+
+		case "kassad":
+			presenterId = dbPresenters.KassadId
+
+		case "mauisnake":
+			presenterId = dbPresenters.MauisnakeId
+
+		}
+
+		newTake := takes.Take{
+			Content:     content,
+			CreatedDate: createDate,
+			DueDate:     dueDate,
+			Tags:        tagsSplit,
+			PresenterId: presenterId,
+			WasCorrect:  wasCorrect,
+		}
+
+		takeSha, err := shaTake(newTake)
+		if err != nil {
+			return nil
+		}
+
+		if slices.Contains(dbTakes, takeSha) {
+			continue
+		}
+		takesRespository.InsertTake(newTake)
+
+	}
+
+	return nil
+}
+
+func createEpisodes(episodeRepo episodes.EpisodesRespository) error {
 	dbEpisodes, err := episodeRepo.GetNames()
 	if err != nil {
 		return err
@@ -36,7 +112,6 @@ func seedDatabase(db *sql.DB) error {
 	stringReader := strings.NewReader(episodesFile)
 	reader := csv.NewReader(stringReader)
 
-	// read the header line
 	reader.Read()
 	rows, err := reader.ReadAll()
 
@@ -55,14 +130,7 @@ func seedDatabase(db *sql.DB) error {
 		}
 
 		episodeRepo.Insert(episode)
-
 	}
-
-	takesRespository.InsertTake(takes.Take{
-		Content:     "",
-		PresenterId: presenter.KassadId,
-	})
-
 	return nil
 }
 
@@ -70,6 +138,18 @@ type presenter struct {
 	ThorinId    int
 	KassadId    int
 	MauisnakeId int
+}
+
+func shaTake(take takes.Take) (string, error) {
+	takeJson, err := json.Marshal(take)
+	if err != nil {
+		return "", err
+	}
+
+	h := sha256.New()
+	h.Write(takeJson)
+	shaCode := h.Sum(nil)
+	return string(shaCode), nil
 }
 
 func initPresenter(repo presenters.PresenterRepository) (presenter, error) {

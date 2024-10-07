@@ -15,6 +15,8 @@ type Take struct {
 	DueDate       time.Time
 	Content       string
 	PresenterName string
+	Sha           string
+	WasCorrect    string
 	Tags          []string
 	PresenterId   int
 	Id            int
@@ -27,7 +29,7 @@ func NewRepo(db *sql.DB) TakesRepository {
 }
 
 func (db *TakesRepository) GetTakes() ([]Take, error) {
-	rows, err := db.db.Query(`select id, p.name, episode, content, tags, result, created_date, due_date
+	rows, err := db.db.Query(`select id, p.name, episode, content, tags, result, created_date, due_date, sha
         from hot_take ht
         inner join presenter p on ht.presenter = p.id`)
 	if err != nil {
@@ -40,19 +42,50 @@ func (db *TakesRepository) GetTakes() ([]Take, error) {
 	for rows.Next() {
 		var take Take
 		var tags string
-		rows.Scan(
+		err := rows.Scan(
 			&take.Id,
 			&take.PresenterName,
 			&take.EpisodeId,
 			&take.Content,
 			&tags,
 			&take.Result,
+			&take.CreatedDate,
+			&take.DueDate,
+			&take.Sha,
 		)
-		err := json.Unmarshal([]byte(tags), &take.Tags)
+		if err != nil {
+			return takes, err
+		}
+
+		err = json.Unmarshal([]byte(tags), &take.Tags)
 		if err != nil {
 			return takes, err
 		}
 		takes = append(takes, take)
+	}
+
+	return takes, nil
+}
+
+func (db *TakesRepository) GetTakeSha() ([]string, error) {
+	rows, err := db.db.Query(`select sha from hot_take ht`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	takes := []string{}
+
+	for rows.Next() {
+		var takeSha string
+		err := rows.Scan(
+			&takeSha,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		takes = append(takes, takeSha)
 	}
 
 	return takes, nil
