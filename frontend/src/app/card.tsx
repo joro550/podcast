@@ -16,6 +16,12 @@ export default function Card({ src, alt }: { src: string; alt: string }) {
         </figure>
       </div>
       <div className="card-content">
+        <div className="media">
+          <div className="media-content">
+            <p className="title is-4">Duncan "Thorin" Shields</p>
+            <p className="subtitle is-6">@Thorin</p>
+          </div>
+        </div>
         <p>Lorem ipsum</p>
         <ResponsiveContainer width="100%" height={200}>
           <PieChart width={400} height={500}>
