@@ -15,14 +15,10 @@ export default function Card({ src, alt }: { src: string; alt: string }) {
           <Image width={100} height={200} alt={alt} src={src} />
         </figure>
       </div>
-      <div className="content">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec
-        iaculis mauris. <a>@bulmaio</a>. <a href="#">#css</a>
-        <a href="#">#responsive</a>
-        <br />
-        <time>11:09 PM - 1 Jan 2016</time>
-        <ResponsiveContainer width={100} height={100}>
-          <PieChart width={400} height={400}>
+      <div className="card-content">
+        <p>Lorem ipsum</p>
+        <ResponsiveContainer width="100%" height={200}>
+          <PieChart width={400} height={500}>
             <Pie
               data={data01}
               dataKey="value"
@@ -30,9 +26,15 @@ export default function Card({ src, alt }: { src: string; alt: string }) {
               cy="50%"
               outerRadius={60}
               fill="#8884d8"
+              label
             />
           </PieChart>
         </ResponsiveContainer>
+      </div>
+      <div className="card-footer">
+        <a href="#" className="card-footer-item">
+          More Information
+        </a>
       </div>
     </div>
   );
