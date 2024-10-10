@@ -1,22 +1,17 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
+	"podcast-server/episodes"
 	"podcast-server/presenters"
 	"podcast-server/shared"
+	"podcast-server/takes"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
-
-type Weather struct {
-	Location    string `json:"location"`
-	Id          int    `json:"id"`
-	Temperature int    `json:"temperature"`
-}
 
 func main() {
 	db, err := ConnectToDatabase()
@@ -40,28 +35,11 @@ func main() {
 
 	r.Use(middleware.Logger)
 	presenters.AddPresenterEndpoints(r, &appServices)
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello mark"))
-	})
+	episodes.AddEpisodeEndpoints(r, &appServices)
+	takes.AddTakeEndpoints(r, &appServices)
 
 	r.Get("/health-check", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-	})
-
-	r.Get("/weather", func(w http.ResponseWriter, r *http.Request) {
-		weather := Weather{Id: 1, Location: "London"}
-
-		weathers := []Weather{
-			weather,
-		}
-
-		encoder := json.NewEncoder(w)
-		err := encoder.Encode(weathers)
-		if err != nil {
-			http.Error(w, "Internal error", http.StatusInternalServerError)
-			return
-		}
 	})
 
 	http.ListenAndServe(":3111", r)

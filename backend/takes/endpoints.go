@@ -37,15 +37,19 @@ func getAllTakes(repo TakesRepository) http.HandlerFunc {
 
 type TakeRsponse struct {
 	Content       string
+	PresenterName string
 	Tags          []string
 	Id            int
-	PresenterName string
 	EpisodeId     int
 	Result        int
 }
 
 func (resp *Take) FromEntity() TakeRsponse {
 	return TakeRsponse{
-		Content: resp.Content,
+		Content:       resp.Content,
+		PresenterName: resp.PresenterName,
+		Tags:          resp.Tags,
+		Id:            resp.Id,
+		EpisodeId:     resp.EpisodeId,
 	}
 }
