@@ -19,6 +19,11 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	// err = seedDatabase(db)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
 	appServices := shared.NewAppService(db)
 
 	r := chi.NewRouter()

@@ -63,6 +63,10 @@ func (repo *EpisodesRespository) GetNames() ([]string, error) {
 }
 
 func (repo *EpisodesRespository) Insert(model Episode) error {
-	_, err := repo.db.Exec(`insert into episode (name, episode_id)  Values (?, ?)`, model.Name, model.EpisodeId)
+	_, err := repo.db.Exec(`insert into episode (name, episode_id)  Values ($1, $2)`,
+		model.Name,
+		model.EpisodeId,
+	)
+
 	return err
 }

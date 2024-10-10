@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"encoding/csv"
 	"encoding/json"
+	"log"
 	"podcast-server/episodes"
 	"podcast-server/presenters"
 	"podcast-server/takes"
@@ -15,10 +16,10 @@ import (
 	"time"
 )
 
-// go:embed seed/takes.csv
+//go:embed seed/takes.csv
 var takesFile string
 
-// go:embed seed/episodes.csv
+//go:embed seed/episodes.csv
 var episodesFile string
 
 func seedDatabase(db *sql.DB) error {
@@ -126,11 +127,16 @@ func createEpisodes(episodeRepo episodes.EpisodesRespository) error {
 		return err
 	}
 
+	log.Println("Got episodes from database")
+
 	stringReader := strings.NewReader(episodesFile)
 	reader := csv.NewReader(stringReader)
 
 	reader.Read()
 	rows, err := reader.ReadAll()
+	if err != nil {
+		return err
+	}
 
 	for _, row := range rows {
 		episodeId, err := strconv.Atoi(row[1])
@@ -146,7 +152,11 @@ func createEpisodes(episodeRepo episodes.EpisodesRespository) error {
 			continue
 		}
 
-		episodeRepo.Insert(episode)
+		err = episodeRepo.Insert(episode)
+		if err != nil {
+			return err
+		}
+		log.Println("Inserted episode ", episode.Name)
 	}
 	return nil
 }
