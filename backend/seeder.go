@@ -31,6 +31,15 @@ func seedDatabase(db *sql.DB) error {
 		return err
 	}
 
+	err = seedTakes(presenterRepository, takesRespository)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func seedTakes(presenterRepository presenters.PresenterRepository, takesRespository takes.TakesRepository) error {
 	dbPresenters, err := initPresenter(presenterRepository)
 	if err != nil {
 		return err
@@ -38,7 +47,7 @@ func seedDatabase(db *sql.DB) error {
 
 	dbTakes, err := takesRespository.GetTakeSha()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	stringReader := strings.NewReader(takesFile)
@@ -56,12 +65,12 @@ func seedDatabase(db *sql.DB) error {
 
 		createDate, err := time.Parse("2023-01-01", createdDateString)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		dueDate, err := time.Parse("2023-01-01", dueDateString)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		tagsSplit := strings.Split(",", tags)
@@ -81,25 +90,33 @@ func seedDatabase(db *sql.DB) error {
 
 		newTake := takes.Take{
 			Content:     content,
-			CreatedDate: createDate,
-			DueDate:     dueDate,
 			Tags:        tagsSplit,
 			PresenterId: presenterId,
-			WasCorrect:  wasCorrect,
 		}
 
 		takeSha, err := shaTake(newTake)
 		if err != nil {
-			return nil
+			return err
 		}
 
-		if slices.Contains(dbTakes, takeSha) {
-			continue
+		dbTake, exists := dbTakes[takeSha]
+
+		newTake.CreatedDate = createDate
+		newTake.DueDate = dueDate
+		newTake.WasCorrect = wasCorrect
+
+		completeSha, err := shaTake(newTake)
+		if err != nil {
+			return err
 		}
-		takesRespository.InsertTake(newTake)
+
+		if !exists {
+			takesRespository.InsertTake(newTake)
+		} else if dbTake.CompleteSha != completeSha {
+			takesRespository.UpdateTake(newTake)
+		}
 
 	}
-
 	return nil
 }
 

@@ -24,6 +24,12 @@ type Take struct {
 	Result        int
 }
 
+type TakeSha struct {
+	Sha         string
+	CompleteSha string
+	Id          int
+}
+
 func NewRepo(db *sql.DB) TakesRepository {
 	return TakesRepository{db: db}
 }
@@ -67,25 +73,27 @@ func (db *TakesRepository) GetTakes() ([]Take, error) {
 	return takes, nil
 }
 
-func (db *TakesRepository) GetTakeSha() ([]string, error) {
-	rows, err := db.db.Query(`select sha from hot_take ht`)
+func (db *TakesRepository) GetTakeSha() (map[string]TakeSha, error) {
+	rows, err := db.db.Query(`select sha, complete_sha, id from hot_take ht`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	takes := []string{}
+	takes := map[string]TakeSha{}
 
 	for rows.Next() {
-		var takeSha string
+		var takeSha TakeSha
 		err := rows.Scan(
-			&takeSha,
+			&takeSha.Sha,
+			&takeSha.CompleteSha,
+			&takeSha.Id,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		takes = append(takes, takeSha)
+		takes[takeSha.Sha] = takeSha
 	}
 
 	return takes, nil
@@ -106,6 +114,17 @@ func (db *TakesRepository) InsertTake(mode Take) error {
 		mode.Result,
 		mode.CreatedDate,
 		mode.DueDate,
+	)
+
+	return err
+}
+
+func (db *TakesRepository) UpdateTake(mode Take) error {
+	_, err := db.db.Exec(`UPDATE hot_take SET created_date = ?, due_date = ?, was_correct = ? where id = ?`,
+		mode.CreatedDate,
+		mode.DueDate,
+		mode.WasCorrect,
+		mode.Id,
 	)
 
 	return err
