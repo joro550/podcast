@@ -39,7 +39,7 @@ func (repo *PresenterRepository) Get() ([]Presenter, error) {
 }
 
 func (repo *PresenterRepository) GetPresenter(name string) (Presenter, error) {
-	rows := repo.db.QueryRow("select id, name from presenters where name = ?", name)
+	rows := repo.db.QueryRow("select id, name from presenters where name = $1", name)
 
 	var presenter Presenter
 	err := rows.Scan(&presenter.Id, &presenter.Name)

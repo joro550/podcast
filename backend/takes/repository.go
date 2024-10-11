@@ -106,7 +106,7 @@ func (db *TakesRepository) InsertTake(mode Take) error {
 	}
 
 	_, err = db.db.Exec(`insert into hot_take (content, presenter, tags, episode_id, result, created_date, due_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		mode.Content,
 		mode.PresenterId,
 		string(result),
@@ -120,7 +120,7 @@ func (db *TakesRepository) InsertTake(mode Take) error {
 }
 
 func (db *TakesRepository) UpdateTake(mode Take) error {
-	_, err := db.db.Exec(`UPDATE hot_take SET created_date = ?, due_date = ?, was_correct = ? where id = ?`,
+	_, err := db.db.Exec(`UPDATE hot_take SET created_date = $1, due_date = $2, was_correct = $3 where id = $4`,
 		mode.CreatedDate,
 		mode.DueDate,
 		mode.WasCorrect,

@@ -41,21 +41,30 @@ func seedDatabase(db *sql.DB) error {
 }
 
 func seedTakes(presenterRepository presenters.PresenterRepository, takesRespository takes.TakesRepository) error {
+	log.Println("seeding takes")
 	dbPresenters, err := initPresenter(presenterRepository)
 	if err != nil {
 		return err
 	}
+	log.Println("Got presenters from database")
 
 	dbTakes, err := takesRespository.GetTakeSha()
 	if err != nil {
 		return err
 	}
+	log.Println("Got existing takes from database")
 
 	stringReader := strings.NewReader(takesFile)
 	reader := csv.NewReader(stringReader)
+	reader.LazyQuotes = true
+	reader.TrimLeadingSpace = true
 
 	reader.Read()
 	rows, err := reader.ReadAll()
+	if err != nil {
+		return err
+	}
+
 	for _, row := range rows {
 		presenter := row[1]
 		content := row[2]
@@ -64,7 +73,9 @@ func seedTakes(presenterRepository presenters.PresenterRepository, takesResposit
 		dueDateString := row[5]
 		wasCorrect := row[6]
 
-		createDate, err := time.Parse("2023-01-01", createdDateString)
+		log.Println(row)
+
+		createDate, err := time.Parse("2023-12-01", createdDateString)
 		if err != nil {
 			return err
 		}
@@ -112,8 +123,11 @@ func seedTakes(presenterRepository presenters.PresenterRepository, takesResposit
 		}
 
 		if !exists {
+			log.Println("Inserting new take", newTake)
 			takesRespository.InsertTake(newTake)
 		} else if dbTake.CompleteSha != completeSha {
+
+			log.Println("Updating take", newTake)
 			takesRespository.UpdateTake(newTake)
 		}
 
@@ -194,6 +208,7 @@ func initPresenter(repo presenters.PresenterRepository) (presenter, error) {
 	if err != nil {
 		return presenter{}, err
 	}
+
 	return presenter{
 		ThorinId:    thorin.Id,
 		KassadId:    kassad.Id,
