@@ -16,6 +16,7 @@ type Take struct {
 	Content       string
 	PresenterName string
 	Sha           string
+	CompleteSha   string
 	WasCorrect    string
 	Tags          []string
 	PresenterId   int
@@ -35,7 +36,7 @@ func NewRepo(db *sql.DB) TakesRepository {
 }
 
 func (db *TakesRepository) GetTakes() ([]Take, error) {
-	rows, err := db.db.Query(`select id, p.name, episode, content, tags, result, created_date, due_date, sha
+	rows, err := db.db.Query(`select id, p.name, episode, content, tags, result, created_date, due_date, sha, complete_sha
         from hot_take ht
         inner join presenter p on ht.presenter = p.id`)
 	if err != nil {
@@ -105,8 +106,8 @@ func (db *TakesRepository) InsertTake(mode Take) error {
 		return err
 	}
 
-	_, err = db.db.Exec(`insert into hot_take (content, presenter, tags, episode_id, result, created_date, due_date)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+	_, err = db.db.Exec(`insert into hot_take (content, presenter, tags, episode, result, created_date, due_date, sha, complete_sha, wascorrect)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 		mode.Content,
 		mode.PresenterId,
 		string(result),
@@ -114,6 +115,9 @@ func (db *TakesRepository) InsertTake(mode Take) error {
 		mode.Result,
 		mode.CreatedDate,
 		mode.DueDate,
+		mode.Sha,
+		mode.CompleteSha,
+		mode.WasCorrect,
 	)
 
 	return err

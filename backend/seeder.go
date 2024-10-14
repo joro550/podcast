@@ -59,28 +59,42 @@ func seedTakes(presenterRepository presenters.PresenterRepository, takesResposit
 	reader.LazyQuotes = true
 	reader.TrimLeadingSpace = true
 
-	reader.Read()
+	_, err = reader.Read()
+	if err != nil {
+		log.Println("Read failed")
+		return err
+	}
+
 	rows, err := reader.ReadAll()
 	if err != nil {
+		log.Println("Read failed")
 		return err
 	}
 
 	for _, row := range rows {
+
 		presenter := row[1]
 		content := row[2]
 		tags := row[3]
 		createdDateString := row[4]
 		dueDateString := row[5]
 		wasCorrect := row[6]
-
+		episode := 1
 		log.Println(row)
 
-		createDate, err := time.Parse("2023-12-01", createdDateString)
+		log.Println("Got row")
+
+		layout := "2006-01-02"
+		createDate, err := time.Parse(layout, createdDateString)
 		if err != nil {
 			return err
 		}
 
-		dueDate, err := time.Parse("2023-01-01", dueDateString)
+		if len(dueDateString) == 0 {
+			dueDateString = "2022-01-01"
+		}
+
+		dueDate, err := time.Parse(layout, dueDateString)
 		if err != nil {
 			return err
 		}
@@ -104,6 +118,7 @@ func seedTakes(presenterRepository presenters.PresenterRepository, takesResposit
 			Content:     content,
 			Tags:        tagsSplit,
 			PresenterId: presenterId,
+			EpisodeId:   episode,
 		}
 
 		takeSha, err := shaTake(newTake)
@@ -122,9 +137,16 @@ func seedTakes(presenterRepository presenters.PresenterRepository, takesResposit
 			return err
 		}
 
+		newTake.Sha = takeSha
+		newTake.CompleteSha = completeSha
+
 		if !exists {
 			log.Println("Inserting new take", newTake)
-			takesRespository.InsertTake(newTake)
+			err = takesRespository.InsertTake(newTake)
+			if err != nil {
+				return err
+			}
+
 		} else if dbTake.CompleteSha != completeSha {
 
 			log.Println("Updating take", newTake)

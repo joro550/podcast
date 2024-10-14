@@ -1,9 +1,9 @@
-import date, presenter, take, tags, created_date, due_date, was_correct
-'2023-10-5', mauisnake, 'If Dev1ce wins both majors he will crowned the goat', "s1mple, dev1ce, cs:go, goat", 2022-12-01, 2023-09-27, no
-'2023-10-5', mauisnake, 'Blad3 is the GOAT coach', "coach, goat", 2022-12-01, 2023-09-27, yes
-'2023-10-5', Kassad, 'Vertigo will not leave the map pool for three years', "maps, vertigo", 2022-12-01, 2025-12-01, undetermined
-'2023-10-5', Thorin, 'Hunden will be a good coach for astralis', "astralis, coach", 2022-12-01, 2023-11-05, no
-'2023-10-5', mauisnake, 'We are still reeling as a community after Henry G revealing player contracts', "players, contracts", 2022-12-01, '', yes
-'2023-10-5', Kassad, 'Complexity should fire their whole team', "teams, Complexity", 2022-12-01, , undetermined
-'2023-10-5', Thorin, 'Cadian will never win the Major as the primary AWPer', "majors, Cadian", 2022-12-01, , undetermined
-'2023-10-5', mauisnake, 'My rifler of the year was Ax1le', "players, Ax1le", 2022-12-01, , no
+import date, presenter, take, tags, created_date, due_date, was_correct, episode
+'2023-10-5', mauisnake, 'If Dev1ce wins both majors he will crowned the goat', "s1mple, dev1ce, cs:go, goat", 2022-12-01, 2023-09-27, no, 1
+'2023-10-5', mauisnake, 'Blad3 is the GOAT coach', "coach, goat", 2022-12-01, 2023-09-27, yes, 1
+'2023-10-5', Kassad, 'Vertigo will not leave the map pool for three years', "maps, vertigo", 2022-12-01, 2025-12-01, undetermined, 1
+'2023-10-5', Thorin, 'Hunden will be a good coach for astralis', "astralis, coach", 2022-12-01, 2023-11-05, no, 1
+'2023-10-5', mauisnake, 'We are still reeling as a community after Henry G revealing player contracts', "players, contracts", 2022-12-01, , yes, 1
+'2023-10-5', Kassad, 'Complexity should fire their whole team', "teams, Complexity", 2022-12-01, , undetermined, 1
+'2023-10-5', Thorin, 'Cadian will never win the Major as the primary AWPer', "majors, Cadian", 2022-12-01, , undetermined, 1
+'2023-10-5', mauisnake, 'My rifler of the year was Ax1le', "players, Ax1le", 2022-12-01, , no, 1
