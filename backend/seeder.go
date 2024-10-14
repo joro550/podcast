@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	_ "embed"
+	"encoding/base64"
 	"encoding/csv"
 	"encoding/json"
 	"log"
@@ -79,10 +80,10 @@ func seedTakes(presenterRepository presenters.PresenterRepository, takesResposit
 		createdDateString := row[4]
 		dueDateString := row[5]
 		wasCorrect := row[6]
-		episode := 1
-		log.Println(row)
-
-		log.Println("Got row")
+		episode, err := strconv.Atoi(row[7])
+		if err != nil {
+			return err
+		}
 
 		layout := "2006-01-02"
 		createDate, err := time.Parse(layout, createdDateString)
@@ -211,8 +212,8 @@ func shaTake(take takes.Take) (string, error) {
 
 	h := sha256.New()
 	h.Write(takeJson)
-	shaCode := h.Sum(nil)
-	return string(shaCode), nil
+
+	return base64.URLEncoding.EncodeToString(h.Sum(nil)), nil
 }
 
 func initPresenter(repo presenters.PresenterRepository) (presenter, error) {

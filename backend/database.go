@@ -74,16 +74,16 @@ func walkDir(db *sql.DB, migrationsRan []string) func(path string, d fs.DirEntry
 			return nil
 		}
 
+		log.Println("Reading file ", path)
+
 		content, err := os.ReadFile(path)
 		if err != nil {
-
 			log.Println("Error reading file", err)
 			return err
 		}
 
 		_, err = db.Exec(string(content))
 		if err != nil {
-
 			log.Println("error executing", err)
 			return err
 		}
