@@ -7,3 +7,13 @@ import date, presenter, take, tags, created_date, due_date, was_correct, episode
 '2023-10-5', Kassad, 'Complexity should fire their whole team', "teams, Complexity", 2022-12-01, , undetermined, 1
 '2023-10-5', Thorin, 'Cadian will never win the Major as the primary AWPer', "majors, Cadian", 2022-12-01, , undetermined, 1
 '2023-10-5', mauisnake, 'My rifler of the year was Ax1le', "players, Ax1le", 2022-12-01, , no, 1
+'2022-12-22', Kassad, 'Navi is not the best CIS team anymore', "", 2022-12-22, 2022-12-22, yes, 2
+'2022-12-22', mauisnake, 'Faze should remove Rain for frozen', "", 2022-12-22, 2022-12-22, no, 2
+'2022-12-22', Thorin, 'Heroic should sign K0nfig', "", 2022-12-22, 2022-12-22, no, 2
+'2022-12-22', Kassad, 'This Blast victory will do more damage for NiKos legacy than if they had won', "", 2022-12-22, 2030-12-22, undetermined, 2
+'2022-12-22', mauisnake, 'Blast world final should end in a Bo5', "", 2022-12-22, 2022-12-22, yes, 2
+'2022-12-22', Thorin, 'S1mple will be #1 this year - this is the worst year for the #1 player', "", 2022-12-22, 2022-12-22, yes, 2
+'2022-12-22', mauisnake, 'Zywoo will be the #2 player of the year', "", 2022-12-22, 2022-12-22, yes, 2
+'2022-12-22', Thorin, 'Zywoo wasnt the #1 in 2020', "", 2022-12-22, 2022-12-22, undetermined, 2
+'2022-12-22', mauisnake, 'Jame is the 2nd best IGL of 2022', "", 2022-12-22, 2022-12-22, yes, 2
+'2022-12-22', Thorin, 'TL will never win a Tier 1 LAN with oSee as primary AWP', "", 2022-12-22, 2022-12-22, yes, 2
