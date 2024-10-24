@@ -36,12 +36,12 @@ func NewRepo(db *sql.DB) TakesRepository {
 }
 
 func (db *TakesRepository) GetTakes() ([]Take, error) {
-	rows, err := db.db.Query(`select id, p.name, episode, content, tags, result, created_date, due_date, sha, complete_sha
-        from hot_take ht
-        inner join presenter p on ht.presenter = p.id`)
+	rows, err := db.db.Query(`select id, presenter, episode, content, tags, result, created_date, due_date, sha, complete_sha
+        from hot_take ht`)
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	takes := []Take{}
@@ -49,9 +49,10 @@ func (db *TakesRepository) GetTakes() ([]Take, error) {
 	for rows.Next() {
 		var take Take
 		var tags string
+
 		err := rows.Scan(
 			&take.Id,
-			&take.PresenterName,
+			&take.PresenterId,
 			&take.EpisodeId,
 			&take.Content,
 			&tags,
@@ -59,6 +60,7 @@ func (db *TakesRepository) GetTakes() ([]Take, error) {
 			&take.CreatedDate,
 			&take.DueDate,
 			&take.Sha,
+			&take.CompleteSha,
 		)
 		if err != nil {
 			return takes, err

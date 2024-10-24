@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"podcast-server/presenters"
 	"podcast-server/shared"
 
 	"github.com/go-chi/chi/v5"
@@ -11,12 +12,13 @@ import (
 
 func AddTakeEndpoints(router *chi.Mux, servives *shared.AppServices) {
 	repo := NewRepo(servives.Db)
+	presenterRepo := presenters.NewRepo(servives.Db)
 	router.Route("/takes", func(r chi.Router) {
-		r.Get("/", getAllTakes(repo))
+		r.Get("/", getAllTakes(repo, presenterRepo))
 	})
 }
 
-func getAllTakes(repo TakesRepository) http.HandlerFunc {
+func getAllTakes(repo TakesRepository, presenterRepo presenters.PresenterRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		takes, err := repo.GetTakes()
 		if err != nil {
@@ -25,9 +27,17 @@ func getAllTakes(repo TakesRepository) http.HandlerFunc {
 			return
 		}
 
+		presenters, err := presenterRepo.Get()
+		if err != nil {
+			log.Println("Takes could not be retrieved", err)
+			w.WriteHeader(500)
+			return
+		}
+		presenterMap := presentersToMap(presenters)
+
 		reponses := []TakeRsponse{}
 		for _, t := range takes {
-			reponses = append(reponses, t.FromEntity())
+			reponses = append(reponses, t.FromEntity(presenterMap))
 		}
 
 		encoder := json.NewEncoder(w)
@@ -35,19 +45,33 @@ func getAllTakes(repo TakesRepository) http.HandlerFunc {
 	}
 }
 
-type TakeRsponse struct {
-	Content       string
-	PresenterName string
-	Tags          []string
-	Id            int
-	EpisodeId     int
-	Result        int
+func presentersToMap(model []presenters.Presenter) map[int]presenters.Presenter {
+	presenterMap := make(map[int]presenters.Presenter)
+	for _, m := range model {
+		presenterMap[m.Id] = m
+	}
+	return presenterMap
 }
 
-func (resp *Take) FromEntity() TakeRsponse {
+type TakeRsponse struct {
+	Content       string   `json:"content"`
+	PresenterName string   `json:"presenterName"`
+	Tags          []string `json:"tags"`
+	Id            int      `json:"id"`
+	EpisodeId     int      `json:"episodeId"`
+	Result        int      `json:"result"`
+}
+
+func (resp *Take) FromEntity(presenterMap map[int]presenters.Presenter) TakeRsponse {
+	presenter, ok := presenterMap[resp.PresenterId]
+	name := ""
+	if ok {
+		name = presenter.Name
+	}
+
 	return TakeRsponse{
 		Content:       resp.Content,
-		PresenterName: resp.PresenterName,
+		PresenterName: name,
 		Tags:          resp.Tags,
 		Id:            resp.Id,
 		EpisodeId:     resp.EpisodeId,
