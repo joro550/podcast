@@ -168,6 +168,8 @@ func createEpisodes(episodeRepo episodes.EpisodesRespository) error {
 
 	stringReader := strings.NewReader(episodesFile)
 	reader := csv.NewReader(stringReader)
+	reader.LazyQuotes = true
+	reader.TrimLeadingSpace = true
 
 	reader.Read()
 	rows, err := reader.ReadAll()
