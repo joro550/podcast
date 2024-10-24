@@ -18,6 +18,8 @@ func AddPresenterEndpoints(router *chi.Mux, services *shared.AppServices) {
 }
 
 func getPresenters(repo PresenterRepository) http.HandlerFunc {
+	log.Println("setting up getting presenters")
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		presenters, err := repo.Get()
 		if err != nil {
