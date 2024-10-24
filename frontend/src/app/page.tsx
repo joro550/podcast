@@ -12,8 +12,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="content">
+      <main className="content pt-4">
         <h1>Counter Strike Hot Takes</h1>
+        <hr />
       </main>
 
       <div className="fixed-grid has-3-cols">

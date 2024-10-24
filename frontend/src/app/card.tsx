@@ -38,7 +38,7 @@ export default function Card({ src, alt }: { src: string; alt: string }) {
         </ResponsiveContainer>
       </div>
       <div className="card-footer">
-        <a href="#" className="card-footer-item">
+        <a href="/presenter/" className="card-footer-item">
           More Information
         </a>
       </div>
