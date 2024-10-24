@@ -1,5 +1,6 @@
 "use client";
-export type Weather = {
+
+export type Presenter = {
+  name: string;
   id: number;
-  temperature: number;
 };

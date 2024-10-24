@@ -1,5 +1,6 @@
 "use client";
-import { Weather } from "./podcast-models";
+
+import { Presenter } from "./podcast-models";
 
 export default class PodcastService {
   private _baseUrl: string;
@@ -8,8 +9,8 @@ export default class PodcastService {
     this._baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
   }
 
-  public async getWeather(): Promise<Weather[]> {
-    let response = await fetch(`${this._baseUrl}/weather`);
-    return (await response.json()) as Weather[];
+  public async getPresenters(): Promise<Presenter[]> {
+    let response = await fetch(`${this._baseUrl}/presenters`);
+    return (await response.json()) as Presenter[];
   }
 }

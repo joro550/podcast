@@ -1,7 +1,15 @@
 import Image from "next/image";
 import { PieChart, Pie, ResponsiveContainer } from "recharts";
 
-export default function Card({ src, alt }: { src: string; alt: string }) {
+export type PresenterCard = {
+  name: string;
+  imageUrl: string;
+  altText: string;
+  username: string;
+  description: string;
+};
+
+export default function Card(presenter: PresenterCard) {
   const data01 = [
     { name: "Group A", value: 400 },
     { name: "Group B", value: 300 },
@@ -12,17 +20,22 @@ export default function Card({ src, alt }: { src: string; alt: string }) {
     <div className="card">
       <div className="card-image">
         <figure className="image is-4by3">
-          <Image width={100} height={200} alt={alt} src={src} />
+          <Image
+            width={100}
+            height={200}
+            alt={presenter.altText}
+            src={presenter.imageUrl}
+          />
         </figure>
       </div>
       <div className="card-content">
         <div className="media">
           <div className="media-content">
-            <p className="title is-4">Duncan "Thorin" Shields</p>
-            <p className="subtitle is-6">@Thorin</p>
+            <p className="title is-4">{presenter.name}</p>
+            <p className="subtitle is-6">{presenter.username}</p>
           </div>
         </div>
-        <p>Lorem ipsum</p>
+        <p>{presenter.description}</p>
         <ResponsiveContainer width="100%" height={200}>
           <PieChart width={400} height={500}>
             <Pie

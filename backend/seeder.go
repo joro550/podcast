@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"log"
 	"podcast-server/episodes"
 	"podcast-server/presenters"
@@ -23,12 +24,20 @@ var takesFile string
 //go:embed seed/episodes.csv
 var episodesFile string
 
+//go:embed seed/presenters.csv
+var presentersFile string
+
 func seedDatabase(db *sql.DB) error {
 	presenterRepository := presenters.NewRepo(db)
 	takesRespository := takes.NewRepo(db)
 	episodeRepo := episodes.NewRepo(db)
 
-	err := createEpisodes(episodeRepo)
+	err := seedPresenters(presenterRepository)
+	if err != nil {
+		return err
+	}
+
+	err = createEpisodes(episodeRepo)
 	if err != nil {
 		return err
 	}
@@ -102,17 +111,11 @@ func seedTakes(presenterRepository presenters.PresenterRepository, takesResposit
 
 		tagsSplit := strings.Split(",", tags)
 
-		var presenterId int
-		switch strings.ToLower(presenter) {
-		case "thorin":
-			presenterId = dbPresenters.ThorinId
+		presenterName := strings.ToLower(presenter)
+		presenterId, ok := dbPresenters[presenterName]
 
-		case "kassad":
-			presenterId = dbPresenters.KassadId
-
-		case "mauisnake":
-			presenterId = dbPresenters.MauisnakeId
-
+		if !ok {
+			return errors.New("Presenter did not exist in map")
 		}
 
 		newTake := takes.Take{
@@ -200,13 +203,70 @@ func createEpisodes(episodeRepo episodes.EpisodesRespository) error {
 	return nil
 }
 
-type presenter struct {
-	ThorinId    int
-	KassadId    int
-	MauisnakeId int
+func seedPresenters(presenterRepo presenters.PresenterRepository) error {
+	dbPresenters, err := presenterRepo.GetNames()
+	if err != nil {
+		return err
+	}
+
+	log.Println("Got presenters from database")
+
+	stringReader := strings.NewReader(presentersFile)
+	reader := csv.NewReader(stringReader)
+	reader.LazyQuotes = true
+	reader.TrimLeadingSpace = true
+
+	reader.Read()
+	rows, err := reader.ReadAll()
+	if err != nil {
+		return err
+	}
+
+	for _, row := range rows {
+		presenter := presenters.Presenter{
+			Name:        row[0],
+			Description: row[1],
+			ImageUrl:    row[2],
+			AltText:     row[3],
+		}
+
+		socials := row[4]
+		err = json.Unmarshal([]byte(socials), &presenter.Socials)
+		if err != nil {
+			return err
+		}
+
+		sha, err := shaTake(presenter)
+		if err != nil {
+			return err
+		}
+
+		// set the sha
+		presenter.Sha = sha
+
+		p, ok := dbPresenters[strings.ToLower(presenter.Name)]
+
+		if !ok {
+			log.Println("Inserted presenter", presenter.Name)
+
+			err = presenterRepo.Insert(presenter)
+			if err != nil {
+				return err
+			}
+		} else if p.Sha != sha || p.Sha == "" {
+			log.Println("Updating presenter ", presenter.Name)
+			err = presenterRepo.Update(p.Id, presenter)
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+
+	return nil
 }
 
-func shaTake(take takes.Take) (string, error) {
+func shaTake(take any) (string, error) {
 	takeJson, err := json.Marshal(take)
 	if err != nil {
 		return "", err
@@ -218,25 +278,18 @@ func shaTake(take takes.Take) (string, error) {
 	return base64.URLEncoding.EncodeToString(h.Sum(nil)), nil
 }
 
-func initPresenter(repo presenters.PresenterRepository) (presenter, error) {
-	thorin, err := repo.GetPresenter("Thorin")
+func initPresenter(repo presenters.PresenterRepository) (map[string]int, error) {
+	dbPresenters, err := repo.Get()
 	if err != nil {
-		return presenter{}, err
+		return nil, err
 	}
 
-	kassad, err := repo.GetPresenter("Kassad")
-	if err != nil {
-		return presenter{}, err
+	mappedPresenters := make(map[string]int)
+
+	for _, presenter := range dbPresenters {
+		name := strings.ToLower(presenter.Name)
+		mappedPresenters[name] = presenter.Id
 	}
 
-	maui, err := repo.GetPresenter("mauisnake")
-	if err != nil {
-		return presenter{}, err
-	}
-
-	return presenter{
-		ThorinId:    thorin.Id,
-		KassadId:    kassad.Id,
-		MauisnakeId: maui.Id,
-	}, nil
+	return mappedPresenters, nil
 }
