@@ -39,13 +39,33 @@ func getPresenters(repo PresenterRepository) http.HandlerFunc {
 }
 
 type PresenterResponse struct {
-	Name string `json:"name"`
-	Id   int    `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	ImageUrl    string   `json:"imageUrl"`
+	AltText     string   `json:"altText"`
+	Socials     []Social `json:"socials"`
+	Id          int      `json:"id"`
+}
+
+type SocialResponse struct {
+	Username string `json:"username"`
+	Url      string `json:"url"`
+	Icon     string `json:"icon"`
 }
 
 func (resp *Presenter) FromEntity() PresenterResponse {
 	return PresenterResponse{
-		Id:   resp.Id,
-		Name: resp.Name,
+		Id:          resp.Id,
+		Name:        resp.Name,
+		Description: resp.Description,
+		ImageUrl:    resp.ImageUrl,
+		AltText:     resp.AltText,
+	}
+}
+
+func (resp *Social) FromEntity() SocialResponse {
+	return SocialResponse{
+		Username: resp.Username,
+		Url:      resp.Url,
 	}
 }

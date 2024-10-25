@@ -15,14 +15,15 @@ type Presenter struct {
 	Description string
 	ImageUrl    string
 	AltText     string
+	Sha         string
 	Socials     []Social
 	Id          int
-	Sha         string
 }
 
 type Social struct {
 	Username string
 	Url      string
+	Icon     string
 }
 
 type SlimPresenter struct {
@@ -59,7 +60,7 @@ func (repo *PresenterRepository) GetNames() (map[string]SlimPresenter, error) {
 }
 
 func (repo *PresenterRepository) Get() ([]Presenter, error) {
-	rows, err := repo.db.Query("select id, name from presenters")
+	rows, err := repo.db.Query("select id, name, description, image_url, alt_text, socials from presenters")
 	if err != nil {
 		return nil, err
 	}
@@ -69,11 +70,27 @@ func (repo *PresenterRepository) Get() ([]Presenter, error) {
 
 	for rows.Next() {
 		var presenter Presenter
+		var socials string
 
-		err := rows.Scan(&presenter.Id, &presenter.Name)
+		err := rows.Scan(&presenter.Id,
+			&presenter.Name,
+			&presenter.Description,
+			&presenter.ImageUrl,
+			&presenter.AltText,
+			&socials,
+		)
 		if err != nil {
 			return nil, err
 		}
+
+		var presenterSocials []Social
+
+		err = json.Unmarshal([]byte(socials), &presenterSocials)
+		if err != nil {
+			return nil, err
+		}
+
+		presenter.Socials = presenterSocials
 
 		presenters = append(presenters, presenter)
 	}
