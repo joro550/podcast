@@ -32,11 +32,11 @@ export default function Home() {
           {data.map((d) => (
             <div className="cell" key={d.id}>
               <Card
-                imageUrl="/Kassad.jpg"
+                imageUrl={d.imageUrl}
                 name={d.name}
-                altText="kassad"
+                altText={d.altText}
                 username="Kassad"
-                description="this is a description"
+                description={d.description}
               />
             </div>
           ))}
