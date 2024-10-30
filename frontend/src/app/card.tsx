@@ -7,6 +7,13 @@ export type PresenterCard = {
   altText: string;
   username: string;
   description: string;
+  socials: PresenterSocial[];
+};
+
+export type PresenterSocial = {
+  username: string;
+  url: string;
+  icon: string;
 };
 
 export default function Card(presenter: PresenterCard) {
@@ -32,7 +39,12 @@ export default function Card(presenter: PresenterCard) {
         <div className="media">
           <div className="media-content">
             <p className="title is-4">{presenter.name}</p>
-            <p className="subtitle is-6">{presenter.username}</p>
+            {presenter.socials.map((s) => (
+              <p className="subtitle is-6">
+                <i className={s.icon}></i>
+                <a href={s.url}>@{s.username}</a>
+              </p>
+            ))}
           </div>
         </div>
         <p>{presenter.description}</p>

@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import "../../styles/globals.sass";
-import Card from "./card";
+import Card, { PresenterSocial } from "./card";
 import { useEffect, useState } from "react";
 import { Presenter } from "../podcast-models";
 import PodcastService from "../podcast-service";
@@ -14,6 +14,10 @@ export default function Home() {
     const service = new PodcastService();
     service.getPresenters().then((presenters) => setData(presenters));
   }, []);
+
+  function socials(presenter: Presenter): PresenterSocial[] {
+    return presenter.socials.map((s) => s);
+  }
 
   return (
     <div className="container">
@@ -37,23 +41,10 @@ export default function Home() {
                 altText={d.altText}
                 username="Kassad"
                 description={d.description}
+                socials={socials(d)}
               />
             </div>
           ))}
-
-          {/* <div className="cell"> */}
-          {/*   <Card */}
-          {/*     src="/Thorin.jpg" */}
-          {/*     alt="Image of Counter strike analyst Thorin" */}
-          {/*   /> */}
-          {/* </div> */}
-          {/**/}
-          {/* <div className="cell"> */}
-          {/*   <Card */}
-          {/*     src="/Mauisnake.jpg" */}
-          {/*     alt="Image of Counter strike analyst mauisnake" */}
-          {/*   /> */}
-          {/* </div> */}
         </div>
       </div>
     </div>

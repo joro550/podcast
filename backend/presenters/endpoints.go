@@ -39,12 +39,12 @@ func getPresenters(repo PresenterRepository) http.HandlerFunc {
 }
 
 type PresenterResponse struct {
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	ImageUrl    string   `json:"imageUrl"`
-	AltText     string   `json:"altText"`
-	Socials     []Social `json:"socials"`
-	Id          int      `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	ImageUrl    string           `json:"imageUrl"`
+	AltText     string           `json:"altText"`
+	Socials     []SocialResponse `json:"socials"`
+	Id          int              `json:"id"`
 }
 
 type SocialResponse struct {
@@ -54,12 +54,18 @@ type SocialResponse struct {
 }
 
 func (resp *Presenter) FromEntity() PresenterResponse {
+	socials := []SocialResponse{}
+	for _, social := range resp.Socials {
+		socials = append(socials, social.FromEntity())
+	}
+
 	return PresenterResponse{
 		Id:          resp.Id,
 		Name:        resp.Name,
 		Description: resp.Description,
 		ImageUrl:    resp.ImageUrl,
 		AltText:     resp.AltText,
+		Socials:     socials,
 	}
 }
 

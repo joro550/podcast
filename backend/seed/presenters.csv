@@ -1,2 +1,4 @@
 name,description,image_url,alt_text,socials
-Thorin,Thorin is a long term analyst and esports historian,/Thorin.jpg,image of thorin at pgl,"[{""username"": ""thorin"", ""url"": ""http://x.com/thorin""}]"
+Thorin,Thorin is a long term analyst and esports historian,/Thorin.jpg,image of thorin at pgl,"[{""username"": ""thorin"", ""url"": ""http://x.com/thorin"", ""icon"":""fa-brands fa-x-twitter""}]"
+Kassad,Kassad is an analyst previous team owner,/Kassad.jpg,image of kassad at pgl,"[{""username"": ""kassad"", ""url"": ""http://x.com/kassad"", ""icon"":""fa-brands fa-x-twitter""}]"
+Mauisnake,Mauisnake is a counter strike analyst ,/mauisnake.jpg,image of mauisnake at pgl,"[{""username"": ""mauisnake"", ""url"": ""http://x.com/mauisnake"", ""icon"":""fa-brands fa-x-twitter""}]"
