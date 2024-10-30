@@ -84,13 +84,12 @@ func (repo *PresenterRepository) Get() ([]Presenter, error) {
 		}
 
 		var presenterSocials []Social
-
 		err = json.Unmarshal([]byte(socials), &presenterSocials)
 		if err != nil {
-			return nil, err
+			presenter.Socials = []Social{}
+		} else {
+			presenter.Socials = presenterSocials
 		}
-
-		presenter.Socials = presenterSocials
 
 		presenters = append(presenters, presenter)
 	}
